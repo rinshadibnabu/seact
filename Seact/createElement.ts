@@ -14,6 +14,7 @@ export function createElement(
   props: Prop | null = {},
   ...children: Child[]
 ): VirtualElement {
+  console.log("creating Element", type)
   return {
     type,
     props: {
