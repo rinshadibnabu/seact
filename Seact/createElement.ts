@@ -1,25 +1,16 @@
-type Prop = Record<string, any>;
-type Child = string | number | null | boolean | VirtualElement;
+import { Prop, Child, SeactElement } from "./types";
 
-interface VirtualElement {
-  type: string;
-  props: {
-    [key: string]: any;
-    children: Child[];
-  };
-}
 
 export function createElement(
   type: string,
   props: Prop | null = {},
   ...children: Child[]
-): VirtualElement {
-  console.log("creating Element", type)
+): SeactElement {
   return {
     type,
     props: {
       ...(props || {}),
-      children: children.map((child) =>
+      children: children.map((child: Child): any =>
         typeof child === "object" ? child : createTextElement(child)
       ),
     },
