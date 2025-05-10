@@ -87,14 +87,20 @@ function commitWork(fiber: Fiber): void {
     return
   }
 
-  const domParent = fiber.parent.dom
+  let domParentFiber = fiber.parent
+  while (!domParentFiber) {
+    domParentFiber = fiber.parent
+  }
+
+  const domParent = domParentFiber
+
   if (
     fiber.effectTag == "PLACEMENT" &&
     fiber.dom != null
   ) {
     domParent.appendChild(fiber.dom)
   } else if (fiber.effectTag == "DELETION") {
-    domParent.removeChild(fiber.dom)
+    commitDeletion(fiber, domParent)
   } else if (
     fiber.effectTag === "UPDATE" &&
     fiber.dom != null
@@ -113,14 +119,21 @@ function commitWork(fiber: Fiber): void {
 
 }
 
-function performUnitOfWork(fiber: Fiber): any {
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber)
+function commitDeletion(fiber: Fiber, domParent: HTMLElement) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom)
+  } else {
+    commitDeletion(fiber, domParent)
   }
+}
 
-  const element = fiber.props.children
-  reconcileChildren(fiber, element)
-
+function performUnitOfWork(fiber: Fiber): any {
+  let isFunction = fiber.type instanceof Function
+  if (isFunction) {
+    updateFunctionComponent(fiber)
+  } else {
+    updateHostComponent(fiber)
+  }
   if (fiber.child) {
     return fiber.child
   }
@@ -130,7 +143,7 @@ function performUnitOfWork(fiber: Fiber): any {
   while (nextFiber) {
     if (nextFiber) {
       return nextFiber.sibling
-    } F
+    }
 
     nextFiber = nextFiber.parent
   }
@@ -140,7 +153,20 @@ function performUnitOfWork(fiber: Fiber): any {
   console.log("performing unit", fiber);
   return null;
 }
+function updateFunctionComponent(fiber: Fiber) {
+  const childrenElement = [fiber.type(fiber.props)]
+  reconcileChildren(fiber, fiber.props.children)
+}
+function updateHostComponent(fiber: Fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber)
+  }
 
+  const element = fiber.props.children
+  reconcileChildren(fiber, element)
+
+
+}
 function reconcileChildren(wipFiber: Fiber, element): void {
 
   let index = 0

@@ -2,7 +2,7 @@ import { Prop, Child, SeactElement } from "./types";
 
 
 export function createElement(
-  type: string,
+  type: string | Function,
   props: Prop | null = {},
   ...children: Child[]
 ): SeactElement {

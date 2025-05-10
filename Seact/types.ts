@@ -2,7 +2,7 @@ export type Prop = Record<string, any>;
 export type Child = string | number | null | boolean | SeactElement;
 type EffectTagConst = "PLACEMENT" | "UPDATE" | "DELETION"
 export interface SeactElement {
-  type: string;
+  type: string | Function;
   props: {
     [key: string]: any;
     children: SeactElement[];
