@@ -9,7 +9,7 @@ export function createElement(
   return {
     type,
     props: {
-      ...(props || {}),
+      ...(props),
       children: children.map((child: Child): any =>
         typeof child === "object" ? child : createTextElement(child)
       ),
