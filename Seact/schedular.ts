@@ -2,6 +2,8 @@ import { createDom } from "./createDom";
 import { SeactElement, Fiber } from "./types";
 
 let nextUnitOfWork: any = null;
+let wipFiber = null
+let hookIndex = null
 let wipRoot: any = null
 let currentRoot = null
 let deletions = null
@@ -123,7 +125,7 @@ function commitDeletion(fiber: Fiber, domParent: HTMLElement) {
   if (fiber.dom) {
     domParent.removeChild(fiber.dom)
   } else {
-    commitDeletion(fiber, domParent)
+    commitDeletion(fiber.child, domParent)
   }
 }
 
@@ -153,7 +155,11 @@ function performUnitOfWork(fiber: Fiber): any {
   console.log("performing unit", fiber);
   return null;
 }
+
 function updateFunctionComponent(fiber: Fiber) {
+  wipFiber = fiber
+  hookIndex = 0
+  wipFiber.hooks = []
   const childrenElement = [fiber.type(fiber.props)]
   reconcileChildren(fiber, fiber.props.children)
 }
@@ -166,6 +172,36 @@ function updateHostComponent(fiber: Fiber) {
   reconcileChildren(fiber, element)
 
 
+}
+
+function useState(initial) {
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[index]
+
+  const actions = oldHook ? oldHook.queue : []
+  actions.forEach(action => {
+    hook.state = action(hook.state)
+  })
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: []
+  }
+
+  const setState = action => {
+    hook.queue
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot
+    }
+    nextUnitOfWork = wipRoot
+    deletions = []
+  }
+  wipFiber.hook.push(hook)
+
+  return [hook.state, setState]
 }
 function reconcileChildren(wipFiber: Fiber, element): void {
 
