@@ -1,6 +1,6 @@
 export type Prop = Record<string, any>;
 export type Child = string | number | null | boolean | SeactElement;
-
+type EffectTagConst = "PLACEMENT" | "UPDATE" | "DELETION"
 export interface SeactElement {
   type: string;
   props: {
@@ -14,7 +14,7 @@ export interface Fiber extends SeactElement {
   child: Fiber;
   dom: HTMLElement | Text;
   alternate: Fiber;
-  effectTag: string;
+  effectTag: EffectTagConst
 }
 
 

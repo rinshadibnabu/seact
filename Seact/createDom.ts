@@ -1,5 +1,6 @@
-import { SeactElement } from "./types"
+import { updateDom } from "./schedular"
 
+import { SeactElement } from "./types"
 export function createDom(element: SeactElement): Text | HTMLElement {
   console.log("new function gets called")
   const dom =
@@ -7,12 +8,6 @@ export function createDom(element: SeactElement): Text | HTMLElement {
       ? document.createTextNode("")
       : document.createElement(element.type)
 
-  const isProperty = key => key !== "children"
-  Object.keys(element.props)
-    .filter(isProperty)
-    .forEach(name => {
-      dom[name] = element.props[name]
-    })
-
+  updateDom(dom, {}, element.props)
   return dom
 }
